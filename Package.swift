@@ -4,7 +4,7 @@
 import PackageDescription
 
 let package = Package(
-	name: "swift-process",
+	name: "NinjaLib",
 	platforms: [
 		.macOS(.v14)
 	],
