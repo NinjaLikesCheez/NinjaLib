@@ -1,13 +1,13 @@
 import Foundation
 
 public extension Process {
-	struct ReturnValue {
+	struct ReturnValue: Sendable {
 		public let stdout: String
 		public let stderr: String
 		public let exitCode: ExitCode
 
 		// swiftlint:disable:next nesting
-		public enum ExitCode {
+		public enum ExitCode: Sendable {
 			case success
 			case failure(Int32)
 
