@@ -1,10 +1,23 @@
 import Foundation
 
 public extension Process {
-	struct Return {
-		let stdout: String
-		let stderr: String
-		let terminationCode: Int32
+	struct ReturnValue {
+		public let stdout: String
+		public let stderr: String
+		public let exitCode: ExitCode
+
+		// swiftlint:disable:next nesting
+		public enum ExitCode {
+			case success
+			case failure(Int32)
+
+			init(_ code: Int32) {
+				self = switch code {
+				case 0: .success
+				default: .failure(code)
+				}
+			}
+		}
 	}
 
 	static func run(
@@ -13,7 +26,7 @@ public extension Process {
 		environment: [String: String] = ProcessInfo.processInfo.environment,
 		workingDirectory: URL? = nil,
 		joinPipes: Bool = false
-	) async throws -> Return {
+	) async throws -> ReturnValue {
 		try await withCheckedThrowingContinuation { continuation in
 			DispatchQueue.global(qos: .userInitiated).async {
 				let stdout = Pipe()
@@ -67,7 +80,7 @@ public extension Process {
 				continuation.resume(returning: .init(
 					stdout: String(decoding: stdoutData, as: UTF8.self),
 					stderr: String(decoding: stderrData, as: UTF8.self),
-					terminationCode: process.terminationStatus
+					exitCode: .init(process.terminationStatus)
 					)
 				)
 			}
